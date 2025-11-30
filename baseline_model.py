@@ -1,6 +1,7 @@
 from typing import Dict, Any, Optional
 import torch
-import  torch.nn.Functional as F
+import  torch.nn.functional as F
+import torch.nn as nn
 
 
 def init_weights(module, gain=0.02):
@@ -70,13 +71,14 @@ class ResNetGenerator(torch.nn.Module):
                                                kernel_size=3, stride=2,
                                                padding=1, output_padding=1,
                                                bias=False),
-                      norm_layer(ngf * mult / 2),
+                      norm_layer(int(ngf * mult / 2)),
                       torch.nn.ReLU(True)]
             mult = mult // 2
         model += [torch.nn.ReflectionPad2d(3),
                   torch.nn.Conv2d(ngf, out_channels, kernel_size=7, padding=0),
                   torch.nn.Tanh()]
         self.model = torch.nn.Sequential(*model)
+        self.apply(init_weights)
     def forward(self, input):
         return self.model(input)
 
@@ -126,6 +128,7 @@ class LSGANLoss(torch.nn.Module):
 class BaselineCycleGan(torch.nn.Module):
 
     def __init__(self, in_channels, out_channels, lambda_cycle, lambda_identity):
+        super().__init__()
         self.G_xy = ResNetGenerator(in_channels, out_channels, ngf=64, num_blocks=9, norm_layer=torch.nn.InstanceNorm2d)
         self.F_yx = ResNetGenerator(out_channels, in_channels, ngf=64, num_blocks=9, norm_layer=torch.nn.InstanceNorm2d)
         self.D_x = PatchGANDiscriminator(in_channels, ndf=64, n_layer=3, norm_layer=torch.nn.InstanceNorm2d)

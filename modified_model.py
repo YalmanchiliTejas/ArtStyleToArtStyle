@@ -257,7 +257,7 @@ class PerceptualStyleLoss(nn.Module):
         return total_content, total_style
 
 
-class BaselineCycleGan(nn.Module):
+class ImprovedCycleGan(nn.Module):
     def __init__(
         self,
         in_channels,
