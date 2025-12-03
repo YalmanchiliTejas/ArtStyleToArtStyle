@@ -3,7 +3,6 @@ import torch
 import  torch.nn.functional as F
 import torch.nn as nn
 
-
 def init_weights(module, gain=0.02):
     """
     Apply Kaiming-normal init to conv layers and constant to norms.
