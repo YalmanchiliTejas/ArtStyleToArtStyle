@@ -9,7 +9,9 @@ from torchvision import transforms
 from torchvision.utils import save_image
 
 from baseline_model import BaselineCycleGan
-from modified_model.py import ImprovedCycleGan
+from modified_model import ImprovedCycleGan
+
+from PIL import Image
 
 
 class ImageDataset(Dataset):
@@ -28,7 +30,7 @@ class ImageDataset(Dataset):
 
         self.transform = transform
 
-        if len(sorted_paths_x) == 0 or len(sorted_paths_y) == 0:
+        if len(self.sorted_paths_x) == 0 or len(self.sorted_paths_y) == 0:
             print(f"This is an issue here it's empty")
             return
     
