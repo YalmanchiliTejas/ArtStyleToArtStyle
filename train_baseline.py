@@ -163,7 +163,7 @@ def train(args):
     if args.model_type == "improved":
         model = ImprovedCycleGan( in_channels=3,out_channels=3,lambda_cycle=args.lambda_cycle,lambda_identity=args.lambda_identity,lambda_content=args.lambda_content,lambda_style=args.lambda_style,lambda_fm=args.lambda_fm,gan_mode=args.gan_mode)
     
-    if torch.cuda.device_count > 2:
+    if torch.cuda.device_count() > 2:
         print("Using", torch.cuda.device_count(), "GPUs with DataParallel")
         model = nn.DataParallel(model) 
 
