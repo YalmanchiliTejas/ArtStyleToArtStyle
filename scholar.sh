@@ -14,17 +14,21 @@
 #SBATCH --cpus-per-gpu=32
 
 # Execute the command
+
+##Old lr: 0.0002
 module load anaconda
-conda activate CS587
+conda activate cvd
+
 cd /home/venkat97/cs593-cvd/ArtStyleToArtStyle
+# cd /home/tyalaman/ArtStyleToArtStyle
 python train_baseline.py  --root datasets \
   --dataset_name cezanne2photo \
   --model_type baseline \
-  --batch_size 1 \
+  --batch_size 2 \
   --num_workers 4 \
-  --load_size 286 \
-  --crop_size 256 \
-  --lr 0.0002 \
+  --load_size 150 \
+  --crop_size 128 \
+  --lr 0.003 \
   --beta1 0.5 \
   --beta2 0.999 \
   --num_epochs 200 \
