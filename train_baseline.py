@@ -21,8 +21,8 @@ class ImageDataset(Dataset):
 
         super().__init__()
 
-        self.dir_x = os.path.join(root, "A")
-        self.dir_y = os.path.join(root, "B")
+        self.dir_x = os.path.join(root, "trainA")
+        self.dir_y = os.path.join(root, "trainB")
 
         self.sorted_paths_x = sorted(glob.glob(os.path.join(self.dir_x, "*")))
         self.sorted_paths_y = sorted(glob.glob(os.path.join(self.dir_y, "*")))
@@ -122,7 +122,7 @@ def save_samples(model, device, sample_batch, output, epoch, max_num):
 
     visuals = (visuals + 1.0) / 2.0
 
-    save_path = os.path.join(out_dir, f"epoch_{epoch:04d}.png")
+    save_path = os.path.join(output, f"epoch_{epoch:04d}.png")
   
     save_image(visuals, save_path, nrow=real_x.size(0))
     print(f"[Samples] Saved to {save_path}")
@@ -135,7 +135,7 @@ def train(args):
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    print(f"Using{device}")
+    print(f"Using {device}")
 
 
     normalize = transforms.Compose(
@@ -150,8 +150,7 @@ def train(args):
         ]
     )
     dataset_root = os.path.join(args.root, args.dataset_name)
-
-    training_dataset = ImageDataset(dataset_root, transform=transform)
+    training_dataset = ImageDataset(dataset_root, transform=normalize)
 
     train_loader = DataLoader(training_dataset, batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers, pin_memory=True, drop_last=True)
 
@@ -167,10 +166,10 @@ def train(args):
     model.to(device)
 
     generator_params = list(model.G_xy.parameters()) + list(model.F_yx.parameters())
-    discriminator_params = list(model.D_x.parameters()) + ist(model.D_y.parameters())
+    discriminator_params = list(model.D_x.parameters()) + list(model.D_y.parameters())
 
-    G = torch.optim.Adams(generator_params, lr=args.lr, beta=(args.beta1, args.beta2))
-    D = torch.optim.Adam(discriminator_params, lr=args.lr , betas(args.beta1, args.beta2))
+    G = torch.optim.Adam(generator_params, lr=args.lr, betas=(args.beta1, args.beta2))
+    D = torch.optim.Adam(discriminator_params, lr=args.lr , betas = (args.beta1, args.beta2))
 
     start_epoch = 1
     if args.resume_path is not None:
@@ -207,15 +206,15 @@ def train(args):
             
             D.zero_grad()
             d_losses = model.compute_discriminator_loss(real_x, real_y)
-            d_total = d_losses["loss_g_total"]
+            d_total = d_losses["loss_d_total"]
             d_total.backward()
             D.step()
 
             global_step += 1
 
             if ( i + 1) % 200 == 0:
-                 log_str = (
-                    f"[Epoch {epoch}/{args.n_epochs}] "
+                log_str = (
+                    f"[Epoch {epoch}/{args.num_epochs}] "
                     f"[Iter {i+1}/{len(train_loader)}] "
                     f"D: {d_total.item():.4f}, G: {g_total.item():.4f}"
                 )
