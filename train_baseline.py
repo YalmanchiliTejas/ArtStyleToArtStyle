@@ -10,6 +10,7 @@ from torchvision.utils import save_image
 
 from baseline_model import BaselineCycleGan
 from modified_model import ImprovedCycleGan
+import torch.nn as nn
 
 from PIL import Image
 
@@ -60,13 +61,13 @@ def save_checkpoint(model, G, D, epoch , out_dir):
     os.makedirs(out_dir, exist_ok=True)
 
     path = os.path.join(out_dir, f"checkpoint_epoch_{epoch:04d}.pt")
-
+    core = model.module if isinstance(model, nn.DataParallel) else model
     torch.save({
         "epoch":epoch,
-        "G_xy": model.G_xy.state_dict(),
-        "F_yx": model.F_yx.state_dict(),
-        "D_x": model.D_x.state_dict(),
-        "D_y": model.D_y.state_dict(),
+        "G_xy": core.G_xy.state_dict(),
+        "F_yx": core.F_yx.state_dict(),
+        "D_x": core.D_x.state_dict(),
+        "D_y": core.D_y.state_dict(),
         "G": G.state_dict(),
         "D": D.state_dict(),
     },
@@ -83,11 +84,11 @@ def load_checkpoint(model, G, D, path, device="cpu"):
         return
     
     checkpoint = torch.load(path, map_location=device)
-
-    model.G_xy.load_state_dict(checkpoint["G_xy"])
-    model.F_yx.load_state_dict(checkpoint["F_yx"])
-    model.D_x.load_state_dict(checkpoint["D_x"])
-    model.D_y.load_state_dict(checkpoint["D_y"])
+    core = model.module if isinstance(model, nn.DataParallel) else model
+    core.G_xy.load_state_dict(checkpoint["G_xy"])
+    core.F_yx.load_state_dict(checkpoint["F_yx"])
+    core.D_x.load_state_dict(checkpoint["D_x"])
+    core.D_y.load_state_dict(checkpoint["D_y"])
 
     if G is not None and "G" in checkpoint:
         G.load_state_dict(checkpoint["G"])
@@ -111,8 +112,8 @@ def save_samples(model, device, sample_batch, output, epoch, max_num):
 
     model.eval()
 
-    real_x = sample_batch["X"]
-    real_y = sample_batch["Y"]
+    real_x = sample_batch["X"].to(device)
+    real_y = sample_batch["Y"].to(device)
 
     real_x, real_y, fake_x , fake_y, rec_x , rec_y = model(real_x, real_y)
     visuals = torch.cat(
@@ -162,18 +163,22 @@ def train(args):
     if args.model_type == "improved":
         model = ImprovedCycleGan( in_channels=3,out_channels=3,lambda_cycle=args.lambda_cycle,lambda_identity=args.lambda_identity,lambda_content=args.lambda_content,lambda_style=args.lambda_style,lambda_fm=args.lambda_fm,gan_mode=args.gan_mode)
     
+    if torch.cuda.device_count > 2:
+        print("Using", torch.cuda.device_count(), "GPUs with DataParallel")
+        model = nn.DataParallel(model) 
 
     model.to(device)
 
-    generator_params = list(model.G_xy.parameters()) + list(model.F_yx.parameters())
-    discriminator_params = list(model.D_x.parameters()) + list(model.D_y.parameters())
+    core = model.module if isinstance(model, nn.DataParallel) else model
+    generator_params = list(core.G_xy.parameters()) + list(core.F_yx.parameters())
+    discriminator_params = list(core.D_x.parameters()) + list(core.D_y.parameters())
 
     G = torch.optim.Adam(generator_params, lr=args.lr, betas=(args.beta1, args.beta2))
     D = torch.optim.Adam(discriminator_params, lr=args.lr , betas = (args.beta1, args.beta2))
 
     start_epoch = 1
     if args.resume_path is not None:
-        last_epoch = load_checkpoint(model, G, D, args.resume_path, device=device)
+        last_epoch = load_checkpoint(core, G, D, args.resume_path, device=device)
         start_epoch = last_epoch + 1
     
         print(f"Training is resuming from this epoch{start_epoch}\n", flush=True)
@@ -187,9 +192,9 @@ def train(args):
             real_x = batch["X"].to(device)
             real_y = batch["Y"].to(device)
 
-            for p in model.D_x.parameters():
+            for p in core.D_x.parameters():
                 p.requires_grad = False
-            for p in model.D_y.parameters():
+            for p in core.D_y.parameters():
                 p.requires_grad = False
 
             G.zero_grad()
@@ -199,9 +204,9 @@ def train(args):
             G.step()
 
 
-            for p in model.D_x.parameters():
+            for p in core.D_x.parameters():
                 p.requires_grad = True
-            for p in model.D_y.parameters():
+            for p in core.D_y.parameters():
                 p.requires_grad = True
             
             D.zero_grad()
@@ -212,7 +217,7 @@ def train(args):
 
             global_step += 1
 
-            if ( i + 1) % 200 == 0:
+            if ( i + 1) % 50 == 0:
                 log_str = (
                     f"[Epoch {epoch}/{args.num_epochs}] "
                     f"[Iter {i+1}/{len(train_loader)}] "
@@ -236,7 +241,7 @@ def train(args):
 
                 print(log_str)
         
-        if epoch % 500 == 0:
+        if epoch % 100 == 0:
             save_checkpoint(model, G, D, epoch=epoch, out_dir = args.checkpoint_dir)
             save_samples(model, device, sample_batch, output = args.sample_dir, epoch=epoch,max_num=3)
 
