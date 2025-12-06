@@ -28,12 +28,12 @@ python train_baseline.py  --root datasets \
   --num_workers 4 \
   --load_size 150 \
   --crop_size 128 \
-  --lr 0.003 \
+  --lr 0.0002 \
   --beta1 0.5 \
   --beta2 0.999 \
-  --num_epochs 10 \
+  --num_epochs 50 \
   --lambda_cycle 10.0 \
-  --lambda_identity 5.0 \
+  --lambda_identity 0.5 \
   --lambda_content 1.0 \
   --lambda_style 1.0 \
   --lambda_fm 10.0 \

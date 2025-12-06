@@ -39,7 +39,7 @@ class ImageDataset(Dataset):
         random.shuffle(self.sorted_paths_x)
         random.shuffle(self.sorted_paths_y)
 
-        max_per_domain = 250   # 500 A + 500 B = 1000 total
+        max_per_domain = 1000   # 500 A + 500 B = 1000 total
         self.sorted_paths_x = self.sorted_paths_x[:max_per_domain]
         self.sorted_paths_y = self.sorted_paths_y[:max_per_domain]
     
@@ -192,7 +192,7 @@ def train(args):
         print(f"Training is resuming from this epoch{start_epoch}\n", flush=True)
     
     global_step = 0
-    max_iter = 300
+    max_iter = 1000
     for epoch in range(start_epoch, args.num_epochs + 1):
 
         model.train()
