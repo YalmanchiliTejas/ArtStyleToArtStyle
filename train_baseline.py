@@ -63,7 +63,30 @@ class ImageDataset(Dataset):
         return {"X": x_image, "Y": y_image}
 
 
+def get_scheduler(optimizer, args):
+    """
+    Create a LambdaLR scheduler that:
+      - keeps LR constant for the first (num_epochs - n_epochs_decay) epochs
+      - then linearly decays it to 0 over n_epochs_decay epochs.
 
+    If args.n_epochs_decay <= 0, returns None (no decay).
+    """
+    if args.n_epochs_decay <= 0:
+        return None
+
+    def lambda_rule(epoch_idx: int):
+        # PyTorch passes 0-based epoch index: 0,1,2,...
+        current_epoch = epoch_idx + 1  # make it 1-based for easier thinking
+        start_decay = args.num_epochs - args.n_epochs_decay
+
+        if current_epoch <= start_decay:
+            return 1.0
+
+        # Linear decay to 0 from (start_decay+1) to num_epochs
+        num_decay = float(args.n_epochs_decay)
+        return max(0.0, (args.num_epochs - current_epoch) / num_decay)
+
+    return torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda_rule)
 def save_checkpoint(model, G, D, epoch , out_dir):
 
     os.makedirs(out_dir, exist_ok=True)
@@ -183,7 +206,8 @@ def train(args):
 
     G = torch.optim.Adam(generator_params, lr=args.lr, betas=(args.beta1, args.beta2))
     D = torch.optim.Adam(discriminator_params, lr=args.lr , betas = (args.beta1, args.beta2))
-
+    scheduler_G = get_scheduler(G, args)
+    scheduler_D = get_scheduler(D, args)
     start_epoch = 1
     if args.resume_path is not None:
         last_epoch = load_checkpoint(core, G, D, args.resume_path, device=device)
@@ -252,11 +276,18 @@ def train(args):
 
                 print(log_str)
         
-        if epoch % 5 == 0:
+        if epoch % 10 == 0:
             save_checkpoint(model, G, D, epoch=epoch, out_dir = args.checkpoint_dir)
             save_samples(model, device, sample_batch, output = args.sample_dir, epoch=epoch,max_num=3)
 
             print(f"Saved the checkpoint at:{args.checkpoint_dir}\nSaved the samples at:{args.sample_dir}")
+
+        if scheduler_G is not None and scheduler_D is not None:
+            scheduler_G.step()
+            scheduler_D.step()
+
+            current_lr = G.param_groups[0]["lr"]
+            print(f"[Epoch {epoch}] LR updated to {current_lr:.7f}")
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -375,6 +406,13 @@ def parse_args():
         type=int,
         default=100,
         help="Number of training epochs",
+    )
+    parser.add_argument(
+        "--n_epochs_decay",
+        type=int,
+        default=0,
+        help="Number of epochs to linearly decay learning rate to zero; "
+             "0 means no decay (constant LR).",
     )
 
     # Checkpoints & samples
