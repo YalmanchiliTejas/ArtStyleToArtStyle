@@ -35,6 +35,13 @@ class ImageDataset(Dataset):
         if len(self.sorted_paths_x) == 0 or len(self.sorted_paths_y) == 0:
             print(f"This is an issue here it's empty")
             return
+        random.seed(42)
+        random.shuffle(self.sorted_paths_x)
+        random.shuffle(self.sorted_paths_y)
+
+        max_per_domain = 500   # 500 A + 500 B = 1000 total
+        self.sorted_paths_x = self.sorted_paths_x[:max_per_domain]
+        self.sorted_paths_y = self.sorted_paths_y[:max_per_domain]
     
     def __len__(self):
         return max(len(self.sorted_paths_y), len(self.sorted_paths_x))
@@ -185,11 +192,14 @@ def train(args):
         print(f"Training is resuming from this epoch{start_epoch}\n", flush=True)
     
     global_step = 0
-
+    max_iter = 500
     for epoch in range(start_epoch, args.num_epochs + 1):
 
         model.train()
         for i , batch in enumerate(train_loader):
+
+            if i >= max_iter:
+                break
             real_x = batch["X"].to(device)
             real_y = batch["Y"].to(device)
 
