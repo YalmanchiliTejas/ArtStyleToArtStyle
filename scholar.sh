@@ -17,7 +17,7 @@
 
 ##Old lr: 0.0002
 module load anaconda
-conda activate cvd
+conda activate CS587
 
 cd /home/venkat97/cs593-cvd/ArtStyleToArtStyle
 # cd /home/tyalaman/ArtStyleToArtStyle
@@ -31,7 +31,7 @@ python train_baseline.py  --root datasets \
   --lr 0.003 \
   --beta1 0.5 \
   --beta2 0.999 \
-  --num_epochs 200 \
+  --num_epochs 10 \
   --lambda_cycle 10.0 \
   --lambda_identity 5.0 \
   --lambda_content 1.0 \
