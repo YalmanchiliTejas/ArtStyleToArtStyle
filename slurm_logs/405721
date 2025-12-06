@@ -744,3 +744,10 @@ Using 2 GPUs with DataParallel
 [Epoch 12/200] [Iter 3000/3143] D: 0.0489, G: 28.0794, loss_g_adversial: 2.3084, loss_cycle: 1.5004, loss_identity: 2.1535, loss_d_x: 0.0319, loss_d_y: 0.0170
 [Epoch 12/200] [Iter 3050/3143] D: 0.3339, G: 20.5161, loss_g_adversial: 1.2386, loss_cycle: 1.1498, loss_identity: 1.5558, loss_d_x: 0.0405, loss_d_y: 0.2934
 [Epoch 12/200] [Iter 3100/3143] D: 0.0390, G: 21.7846, loss_g_adversial: 1.7912, loss_cycle: 1.2555, loss_identity: 1.4878, loss_d_x: 0.0315, loss_d_y: 0.0075
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+=======
+[2025-12-05T20:23:12.051] error: *** JOB 405721 ON scholar-h002 CANCELLED AT 2025-12-05T20:23:12 DUE to SIGNAL Terminated ***
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
