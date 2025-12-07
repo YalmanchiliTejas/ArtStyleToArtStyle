@@ -1,0 +1,10 @@
+Style      | Ver        | FID (A2P)  | LPIPS (A2P)  | LPIPS (P2A) 
+----------------------------------------------------------------------
+cezanne    | baseline   | 11.62      | 0.5516       | 0.5586      
+cezanne    | improved   | 9.68       | 0.5192       | 0.5019      
+monet      | baseline   | 4.28       | 0.4618       | 0.3631      
+monet      | improved   | 4.21       | 0.3299       | 0.2904      
+ukiyoe     | baseline   | 17.06      | 0.4450       | 0.5056      
+ukiyoe     | improved   | 14.31      | 0.3613       | 0.5006      
+vangogh    | baseline   | 2.34       | 0.5113       | 0.4950      
+vangogh    | improved   | 3.10       | 0.3143       | 0.4034      
