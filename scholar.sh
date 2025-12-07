@@ -17,13 +17,13 @@
 
 ##Old lr: 0.0002
 module load anaconda
-conda activate rl-sparse
+conda activate CS587
 
-# cd /home/venkat97/cs593-cvd/ArtStyleToArtStyle
-cd /home/tyalaman/ArtStyleToArtStyle
+cd /home/venkat97/cs593-cvd/ArtStyleToArtStyle
+# cd /home/tyalaman/ArtStyleToArtStyle
 python train_baseline.py  --root datasets \
-  --dataset_name cezanne2photo \
-  --model_type improved \
+  --dataset_name vangogh2photo \
+  --model_type baseline \
   --batch_size 1 \
   --num_workers 4 \
   --load_size 150 \
@@ -32,12 +32,12 @@ python train_baseline.py  --root datasets \
   --beta1 0.5 \
   --beta2 0.999 \
   --num_epochs 80 \
-  --n_epochs_decay 40\
+  --n_epochs_decay 0\
   --lambda_cycle 10.0 \
-  --lambda_identity 0.5 \
+  --lambda_identity 5 \
   --lambda_content 1.0 \
   --lambda_style 1.0 \
   --lambda_fm 1.0 \
-  --checkpoint_dir checkpoints/cezanne2photo_improved\
-  --sample_dir samples/cezanne2photo_improved\
+  --checkpoint_dir checkpoints/vangogh2photo_baseline\
+  --sample_dir samples/vangogh2photo_baseline\
   --seed 42
