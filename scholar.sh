@@ -43,6 +43,6 @@ cd /home/venkat97/cs593-cvd/ArtStyleToArtStyle
 #   --seed 42
 # python evaluate_model.py
 python test_model.py \
-  --dataset_name cezanne2photo \
+  --dataset_name monet2photo \
   --model_type baseline \
-  --checkpoint_dir checkpoints/cezanne2photo_baseline \
+  --checkpoint_dir checkpoints/monet2photo_baseline \

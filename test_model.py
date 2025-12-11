@@ -73,8 +73,8 @@ def run_inference(model, root, dataset_name, device, output_dir, max_images):
     with torch.no_grad():
         for i, batch in enumerate(loader_A):
             if i >= max_images: break
-            
-            if i % 10 != 0:
+            # only save 5 % of images
+            if i % 20 != 0:
                 continue
             real_A = batch["img"].to(device)
             
@@ -102,7 +102,8 @@ def run_inference(model, root, dataset_name, device, output_dir, max_images):
     with torch.no_grad():
         for i, batch in enumerate(loader_B):
             if i >= max_images: break
-            if i % 20 != 0:
+            # only save 2.5% of images
+            if i % 40 != 0:
                 continue
             real_B = batch["img"].to(device)
             
