@@ -41,4 +41,8 @@ cd /home/venkat97/cs593-cvd/ArtStyleToArtStyle
 #   --checkpoint_dir checkpoints/vangogh2photo_baseline\
 #   --sample_dir samples/vangogh2photo_baseline\
 #   --seed 42
-python evaluate_model.py
+# python evaluate_model.py
+python test_model.py \
+  --dataset_name cezanne2photo \
+  --model_type baseline \
+  --checkpoint_dir checkpoints/cezanne2photo_baseline \
