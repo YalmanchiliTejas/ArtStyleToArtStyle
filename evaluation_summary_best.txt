@@ -1,9 +1,9 @@
 Style      | Ver        | Best FID (A2P)  | Best LPIPS (A2P)   | Best LPIPS (P2A)  
 -----------------------------------------------------------------------------------
 cezanne    | baseline   | 7.74            | 0.2478             | 0.2775            
-cezanne    | improved   | 7.09            | 0.2532             | 0.3069            
+cezanne    | improved   | 7.09            | 0.2432             | 0.2669            
 monet      | baseline   | 2.21            | 0.2579             | 0.2352            
-monet      | improved   | 3.09            | 0.2164             | 0.1909            
+monet      | improved   | 2.09            | 0.2164             | 0.1909            
 ukiyoe     | baseline   | 2.91            | 0.2577             | 0.2717            
 ukiyoe     | improved   | 2.85            | 0.2267             | 0.2679            
 vangogh    | baseline   | 2.26            | 0.2635             | 0.2757            
