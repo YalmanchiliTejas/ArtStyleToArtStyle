@@ -73,9 +73,13 @@ def run_inference(model, root, dataset_name, device, output_dir, max_images):
     with torch.no_grad():
         for i, batch in enumerate(loader_A):
             if i >= max_images: break
+            if dataset_name == "cezanne2photo":
+                if i % 5 != 0:
+                    continue
             # only save 5 % of images
-            if i % 20 != 0:
-                continue
+            else:
+                if i % 20 != 0:
+                    continue
             real_A = batch["img"].to(device)
             
             # Forward Cycle
